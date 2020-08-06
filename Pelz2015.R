@@ -16,13 +16,22 @@
 # expected information gains
 
 # learning curve: Gompertz
-info_gain <- function(t, a=100, c=1) {
+info_gain <- function(t, a=100, b=1, c=1) {
   # returns amount of information known about each object at time t, 
   # a is the maximum amount of information that can be learned from each object (fixed at 100 bits), 
   # b characterizes the amount of initial information, 
   # c is the learning rate (fixed at 1.0 for simplicity)
   return( a*exp(-b*exp(-c*t)) )
 }
+
+# with b=0, you get a
+timesteps = seq(0,10, .1)
+ig = rep(NA, length(timesteps))
+for(t in 1:length(timesteps)) {
+  ig[t] = info_gain(timesteps[t], b=2)
+}
+
+plot(x=timesteps, y=ig)
 
 # power law decay of information for unattended objects
 decay <- function(t, beta=.1) {

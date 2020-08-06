@@ -1,0 +1,19 @@
+---
+title: "Simple Curiosity Models"
+author: "George"
+date: "8/6/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(tidyverse)
+source("Pelz2015.R")
+```
+
+## Goal
+
+
+
+```{r}
+
+```
