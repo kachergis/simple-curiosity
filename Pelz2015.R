@@ -53,12 +53,13 @@ plot_decay <- function() {
 softmax <- function(obj_info, chi=30) {
   # chi=0 - random choice, chi=Inf - perfect maximization; 
   # chi=30 corresponds to a 95% chance of choosing an option that gives .1 bits more than its alternative
-  choice_prob = exp(chi*obj_info) / sum(exp(chi*obj_info))
+  obj_info_norm = obj_info / sum(obj_info)
+  choice_prob = exp(chi*obj_info_norm) / sum(exp(chi*obj_info_norm))
   return(choice_prob) # probability of choosing each object
 }
 
 # expected information gain of attending to each object (including switch cost)
-exp_info_gain <- function(obj_info, switch_cost=.5) {
+exp_info_gain <- function(obj_info, t, switch_cost=.5) {
   gain = info_gain(t) - obj_info - switch_cost # NEED TO NOT SUBTRACT SWITCH COST FOR ATTENDED OBJ!
   return(gain)
 }
@@ -70,7 +71,7 @@ run_sim <- function(obj_start_info, timesteps=seq(0,5,.1)) {
   info_traj = matrix(0, nrow=length(timesteps), ncol=nobj) # information per object over time
   info_traj[1,] = obj_start_info
   for(t in 2:length(timesteps)) {
-    eig = exp_info_gain(info_traj[t-1,])
+    eig = exp_info_gain(info_traj[t-1,], t)
     choice_prob = softmax(eig)
     attended_obj = sample(1:nobj, prob=choice_prob, 1)
     unattended_objs = setdiff(1:nobj, attended_obj)
