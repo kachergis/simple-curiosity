@@ -23,12 +23,14 @@ The Pelz model has five components:
 4. the amount of information that the learner knows about the objects at the start of test, and
 5. softmax probabilistic decision rule to choose which  attention between objects.
 
-We illustrate the learning and decay curves below
+We plot the learning curve for an attended stimulus and decay curve for unattended stimuli below.
 
-```{r}
+```{r, echo=F, width=6.5, height=4}
+par(mfrow=c(1,2), cex.main=.9)
 plot_info_gain()
+plot_decay()
 ```
 
 ```{r}
-plot_decay()
+
 ```

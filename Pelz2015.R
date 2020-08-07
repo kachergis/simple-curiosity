@@ -27,7 +27,8 @@ info_gain <- function(t, a=100, b=1, c=1) {
 plot_info_gain <- function() {
   timesteps = seq(0,5, .01)
   info = unlist(lapply(timesteps, info_gain, b=5))
-  plot(x=timesteps, y=info, main="Gompertz learning curve for attended stimulus")
+  plot(x=timesteps, y=info, main="Learning curve for attended stimulus",
+       ylab="Information (bits)")
 }
 
 #plot_info_gain()
@@ -42,7 +43,8 @@ decay <- function(t, beta=.1) {
 plot_decay <- function() {
   timesteps = seq(0,5, .01)
   info = unlist(lapply(timesteps, decay))
-  plot(x=timesteps, y=info, main="Information decay for unattended stimuli")
+  plot(x=timesteps, y=info, main="Information decay for unattended stimuli",
+       ylab="Percent Information")
 }
 
 #plot_decay()
@@ -50,17 +52,34 @@ plot_decay <- function() {
 # softmax to determine P(choosing to attend obj i)
 softmax <- function(obj_info, chi=30) {
   # chi=0 - random choice, chi=Inf - perfect maximization; 
-  # chi=30 corresponds to a 95% chance of choosing an option that giving .1 bits more than its alternative
-  exp(chi*obj_info) / sum(exp(chi*obj_info))
+  # chi=30 corresponds to a 95% chance of choosing an option that gives .1 bits more than its alternative
+  choice_prob = exp(chi*obj_info) / sum(exp(chi*obj_info))
+  return(choice_prob) # probability of choosing each object
 }
 
-run_sim <- function(nobj, timesteps=100) {
-  obj_info = 1:nobj # object starting information (could be random starting amount)
-  info_traj = matrix(nrow=timesteps, ncol=nobj)
-  for(t in 1:timesteps) {
-    attended_obj = softmax(info_traj)
-    #info_traj[t,]
+# expected information gain of attending to each object (including switch cost)
+exp_info_gain <- function(obj_info, switch_cost=.5) {
+  gain = info_gain(t) - obj_info - switch_cost # NEED TO NOT SUBTRACT SWITCH COST FOR ATTENDED OBJ!
+  return(gain)
+}
+
+#softmax(c(1,1,2), chi=5)
+
+run_sim <- function(obj_start_info, timesteps=seq(0,5,.1)) {
+  nobj = length(obj_start_info) # number of objects
+  info_traj = matrix(0, nrow=length(timesteps), ncol=nobj) # information per object over time
+  info_traj[1,] = obj_start_info
+  for(t in 2:length(timesteps)) {
+    eig = exp_info_gain(info_traj[t-1,])
+    choice_prob = softmax(eig)
+    attended_obj = sample(1:nobj, prob=choice_prob, 1)
+    unattended_objs = setdiff(1:nobj, attended_obj)
+    info_traj[t,attended_obj] = info_gain(timesteps[t]) # maybe multiplied or added to info_traj[t-1] ?
+    info_traj[t,unattended_objs] = info_traj[t-1,unattended_objs] * decay(timesteps[t])
   }
+  colnames(info_traj) = paste("Object",1:nobj)
+  return(info_traj)
 }
 
-run_sim(10)
+sim1 = run_sim(c(2,2,4))
+sim2 = run_sim(c(1,1,1))
