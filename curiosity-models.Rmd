@@ -13,7 +13,22 @@ source("Pelz2015.R")
 ## Goal
 
 
+## Components of the Pelz et al. 2015 model
+
+The Pelz model has five components: 
+
+1. the Gompertz learning curve that the learner follows when attending to a stimulus, 
+2. decay of short term memory operating on unattended stimuli,
+3. the cost of switching attention between objects (0.5 bits), and 
+4. the amount of information that the learner knows about the objects at the start of test, and
+5. softmax probabilistic decision rule to choose which  attention between objects.
+
+We illustrate the learning and decay curves below
 
 ```{r}
+plot_info_gain()
+```
 
+```{r}
+plot_decay()
 ```

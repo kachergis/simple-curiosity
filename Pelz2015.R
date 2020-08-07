@@ -15,7 +15,7 @@
 # and chooses whether to continue to attend to the current object or to switch to another based on the 
 # expected information gains
 
-# learning curve: Gompertz
+# Gompertz learning curve for currently attended object
 info_gain <- function(t, a=100, b=1, c=1) {
   # returns amount of information known about each object at time t, 
   # a is the maximum amount of information that can be learned from each object (fixed at 100 bits), 
@@ -24,14 +24,13 @@ info_gain <- function(t, a=100, b=1, c=1) {
   return( a*exp(-b*exp(-c*t)) )
 }
 
-# with b=0, you get a
-timesteps = seq(0,10, .1)
-ig = rep(NA, length(timesteps))
-for(t in 1:length(timesteps)) {
-  ig[t] = info_gain(timesteps[t], b=2)
+plot_info_gain <- function() {
+  timesteps = seq(0,5, .01)
+  info = unlist(lapply(timesteps, info_gain, b=5))
+  plot(x=timesteps, y=info, main="Gompertz learning curve for attended stimulus")
 }
 
-plot(x=timesteps, y=ig)
+#plot_info_gain()
 
 # power law decay of information for unattended objects
 decay <- function(t, beta=.1) {
@@ -39,6 +38,14 @@ decay <- function(t, beta=.1) {
   # beta = information decay parameter
   return( (t+1)^(-beta) )
 }
+
+plot_decay <- function() {
+  timesteps = seq(0,5, .01)
+  info = unlist(lapply(timesteps, decay))
+  plot(x=timesteps, y=info, main="Information decay for unattended stimuli")
+}
+
+#plot_decay()
 
 # softmax to determine P(choosing to attend obj i)
 softmax <- function(obj_info, chi=30) {
@@ -48,10 +55,11 @@ softmax <- function(obj_info, chi=30) {
 }
 
 run_sim <- function(nobj, timesteps=100) {
-  obj_info = rep(0, nobj) # object information (could be random starting amount)
+  obj_info = 1:nobj # object starting information (could be random starting amount)
   info_traj = matrix(nrow=timesteps, ncol=nobj)
   for(t in 1:timesteps) {
-    info_traj[i,]
+    attended_obj = softmax(info_traj)
+    #info_traj[t,]
   }
 }
 
