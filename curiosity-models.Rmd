@@ -23,14 +23,25 @@ The Pelz model has five components:
 4. the amount of information that the learner knows about the objects at the start of test, and
 5. softmax probabilistic decision rule to choose which  attention between objects.
 
-We plot the learning curve for an attended stimulus and decay curve for unattended stimuli below.
+We plot the learning curve for an attended stimulus and decay curve ($\beta = 0.1$) for unattended stimuli below.
+The Gompertz learning curve has parameters $a = 100$, the maximum amount of information (bits) that can be learned from each object; $b = 5$, the amount of initial information, and learning rate $c = 1$.
 
 ```{r, echo=F, width=6.5, height=4}
 par(mfrow=c(1,2), cex.main=.9)
 plot_info_gain()
-plot_decay()
+plot_decay(0.1)
 ```
 
-```{r}
+## Simple simulations
 
+We run a simple simulation with three objects, each with starting information of 1.
+```{r}
+sim1 = run_sim(c(1,1,1))
+long <- sim1 %>% pivot_longer(cols = starts_with("Object."), 
+                              names_to="Object", 
+                              names_prefix="Object.",
+                              values_to="Information")
+long %>% ggplot(aes(x=time, y=Information, group=Object, color=Object)) +
+  geom_point() + geom_line() +
+  theme_bw()
 ```

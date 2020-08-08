@@ -40,9 +40,9 @@ decay <- function(t, beta=.1) {
   return( (t+1)^(-beta) )
 }
 
-plot_decay <- function() {
+plot_decay <- function(beta) {
   timesteps = seq(0,5, .01)
-  info = unlist(lapply(timesteps, decay))
+  info = unlist(lapply(timesteps, decay, beta))
   plot(x=timesteps, y=info, main="Information decay for unattended stimuli",
        ylab="Percent Information")
 }
@@ -70,6 +70,7 @@ run_sim <- function(obj_start_info, timesteps=seq(0,5,.1)) {
   nobj = length(obj_start_info) # number of objects
   info_traj = matrix(0, nrow=length(timesteps), ncol=nobj) # information per object over time
   info_traj[1,] = obj_start_info
+  attended_obj = 0 # initialize
   for(t in 2:length(timesteps)) {
     eig = exp_info_gain(info_traj[t-1,], t)
     choice_prob = softmax(eig)
@@ -79,8 +80,11 @@ run_sim <- function(obj_start_info, timesteps=seq(0,5,.1)) {
     info_traj[t,unattended_objs] = info_traj[t-1,unattended_objs] * decay(timesteps[t])
   }
   colnames(info_traj) = paste("Object",1:nobj)
+  info_traj = data.frame(info_traj)
+  info_traj$time = timesteps
   return(info_traj)
 }
 
-sim1 = run_sim(c(2,2,4))
-sim2 = run_sim(c(1,1,1))
+sim2 = run_sim(c(2,2,4))
+
+
